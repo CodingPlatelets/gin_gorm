@@ -12,8 +12,8 @@ func SetupRouter() *gin.Engine {
 
 	user := r.Group("/v1/user")
 	{
-		user.POST("/register", Controller.Register)
-		user.POST("/login", Controller.Login)
+		user.POST("/register", Middleware.CORSMiddleware(), Controller.Register)
+		user.POST("/login", Middleware.CORSMiddleware(), Controller.Login)
 		user.GET("/info", Middleware.AuthMiddleware(), Controller.Info)
 	}
 
