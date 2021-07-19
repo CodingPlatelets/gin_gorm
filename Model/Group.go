@@ -7,7 +7,7 @@ type Group struct {
 	GroupName string    `gorm:"varchar(255);unique" json:"groupName" uri:"groupName"`
 	ItemCOUNT int       `json:"item" uri:"item"`
 	User      User      `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	UserId    uint      `json:"userId" uri:"userId"`
-	CreatedAt time.Time `json:"createdAt" uri:"createdAt" gorm:"autoCreateTime"`
+	UserId    uint      `json:"userId" uri:"userId,omitempty"`
+	CreatedAt time.Time `json:"createdAt" uri:"createdAt" gorm:"autoCreateTime,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt" uri:"updatedAt" gorm:"autoUpdateTime"`
 }

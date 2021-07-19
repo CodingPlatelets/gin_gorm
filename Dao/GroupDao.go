@@ -7,7 +7,7 @@ import (
 
 func GetGroupsByUserId(id uint) ([]*Model.Group, error) {
 	var groups []*Model.Group
-	err := Db.DB.Where("userId=?", id).Find(&groups).Error
+	err := Db.DB.Where("user_id=?", id).Find(&groups).Error
 	if err != nil {
 		return nil, err
 	} else {
@@ -16,21 +16,21 @@ func GetGroupsByUserId(id uint) ([]*Model.Group, error) {
 }
 func GetGroupByGroupName(name string) (*Model.Group, error) {
 	group := new(Model.Group)
-	if err := Db.DB.Where("groupName=?", name).First(&group).Error; err != nil {
+	if err := Db.DB.Where("group_name=?", name).First(&group).Error; err != nil {
 		return nil, err
 	}
 	return group, nil
 }
 func GetGroupByGroupId(id uint) (*Model.Group, error) {
 	group := new(Model.Group)
-	if err := Db.DB.Where("groupId=?", id).First(&group).Error; err != nil {
+	if err := Db.DB.Where("group_id=?", id).First(&group).Error; err != nil {
 		return nil, err
 	}
 	return group, nil
 }
 
 func UpdateGroup(group *Model.Group) (*Model.Group, error) {
-	err := Db.DB.Save(&group).Error
+	err := Db.DB.Omit("created_at", "user_id").Save(&group).Error
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func DeleteGroupByName(name string) error {
 }
 func DeleteGroupById(id uint) error {
 	group := Model.Group{}
-	err := Db.DB.Where("groupId = ?", id).Delete(&group).Error
+	err := Db.DB.Where("group_id = ?", id).Delete(&group).Error
 	if err != nil {
 		return err
 	}

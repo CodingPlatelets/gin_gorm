@@ -22,7 +22,7 @@ func SetupRouter() *gin.Engine {
 		group.POST("/add", Middleware.AuthMiddleware(), Controller.AddGroup)
 		group.PUT("/:id", Middleware.AuthMiddleware(), Controller.UpdateGroup)
 		group.DELETE("/:id", Middleware.AuthMiddleware(), Controller.DeleteGroupById)
-		group.GET("/list", Middleware.AuthMiddleware(), Controller.GetTodoList)
+		group.GET("/list", Middleware.AuthMiddleware(), Controller.ShowGroupList)
 	}
 
 	//

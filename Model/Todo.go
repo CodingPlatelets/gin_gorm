@@ -7,10 +7,10 @@ type Todo struct {
 	TodoName    string    `gorm:"primaryKey;unique" json:"todoName" uri:"todoName"`
 	TodoContent string    `gorm:"primaryKey" json:"todoContent" uri:"todoContent"`
 	IsFinished  bool      `json:"isFinished" uri:"isFinished"`
-	UserId      uint      `json:"userId" uri:"userId"`
-	GroupId     uint      `json:"groupId" uri:"groupId"`
+	UserId      uint      `json:"userId" uri:"userId" gorm:"omitempty"`
+	GroupId     uint      `json:"groupId" uri:"groupId" gorm:"omitempty"`
 	User        User      `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Group       Group     `gorm:"foreignKey:GroupId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	CreatedAt   time.Time `json:"createdAt" uri:"createdAt" gorm:"autoCreateTime"`
+	CreatedAt   time.Time `json:"createdAt" uri:"createdAt" gorm:"autoCreateTime,omitempty"`
 	UpdatedAt   time.Time `json:"updatedAt" uri:"updatedAt" gorm:"autoUpdateTime"`
 }
