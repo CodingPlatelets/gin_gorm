@@ -41,16 +41,22 @@ func GetTodoByUserID(id uint) ([]*Model.Todo, error) {
 }
 
 func AddTodo(todo *Model.Todo) (*Model.Todo, error) {
-	err := Db.DB.Create(&todo).Error
+	err := Db.DB.Create(todo).Error
 	if err != nil {
 		return nil, err
 	}
 	return todo, nil
 }
 func UpdateTodo(todo *Model.Todo) (*Model.Todo, error) {
-	err := Db.DB.Omit("created_at", "user_id", "group_id", "todo_name", "todo_content").Save(&todo).Error
-	if err != nil {
-		return nil, err
+	if todo.IsFinished == false {
+		err := Db.DB.Model(todo).Update("is_finished", 0).Error
+		if err != nil {
+			return nil, err
+		}
+	}
+	err2 := Db.DB.Omit("created_at" /* "user_id", "group_id", "todo_name", "todo_content"*/).Updates(todo).Error
+	if err2 != nil {
+		return nil, err2
 	}
 	return todo, nil
 }

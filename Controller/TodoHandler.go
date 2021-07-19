@@ -29,6 +29,8 @@ func AddTodo(ctx *gin.Context) {
 	if errUser != nil {
 		Response.Fail(ctx, gin.H{"error": errUser}, "group is not exits")
 	} else {
+		//todo: 等价于: UPDATE `foods` SET `stock` = stock + 1  WHERE `foods`.`id` = '2'
+		//db.Model(&food).Update("stock", gorm.Expr("stock + 1"))
 		count.ItemCOUNT++
 		_, errCount := Dao.UpdateGroup(count)
 		if errCount != nil {
