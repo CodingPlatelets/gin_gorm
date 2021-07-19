@@ -28,6 +28,18 @@ func GetGroupByGroupId(id uint) (*Model.Group, error) {
 	}
 	return group, nil
 }
+func GetGroupByTodoId(id uint) (*Model.Group, error) {
+	todo := new(Model.Todo)
+	if err := Db.DB.Where("todo_id=?", id).First(&todo).Error; err != nil {
+		return nil, err
+	} else {
+		group := new(Model.Group)
+		if err := Db.DB.Where("group_id=?", todo.GroupId).First(&group).Error; err != nil {
+			return nil, err
+		}
+		return group, nil
+	}
+}
 
 func UpdateGroup(group *Model.Group) (*Model.Group, error) {
 	err := Db.DB.Omit("created_at", "user_id").Save(&group).Error

@@ -8,7 +8,7 @@ type GroupDto struct {
 	ItemCOUNT int    `json:"item" uri:"item"`
 }
 
-func TodoGroupId(group Model.Group) GroupDto {
+func ToGroupDto(group Model.Group) GroupDto {
 	return GroupDto{
 		GroupId:   group.GroupId,
 		GroupName: group.GroupName,

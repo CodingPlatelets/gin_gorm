@@ -7,7 +7,7 @@ import (
 
 func GetTodoByTodoName(todoName string) (*Model.Todo, error) {
 	todo := new(Model.Todo)
-	if err := Db.DB.Where("todoName=?", todoName).First(&todo).Error; err != nil {
+	if err := Db.DB.Where("todo_name = ?", todoName).First(&todo).Error; err != nil {
 		return nil, err
 	}
 	return todo, nil
@@ -15,7 +15,7 @@ func GetTodoByTodoName(todoName string) (*Model.Todo, error) {
 
 func GetTodoById(todoId uint) (*Model.Todo, error) {
 	todo := new(Model.Todo)
-	if err := Db.DB.Where("todoId=?", todoId).First(&todo).Error; err != nil {
+	if err := Db.DB.Where("todo_id=?", todoId).First(&todo).Error; err != nil {
 		return nil, err
 	}
 	return todo, nil
@@ -23,7 +23,7 @@ func GetTodoById(todoId uint) (*Model.Todo, error) {
 
 func GetTodoByGroupID(id uint) ([]*Model.Todo, error) {
 	var todos []*Model.Todo
-	err := Db.DB.Where("GroupId=?", id).Find(&todos).Error
+	err := Db.DB.Where("group_id=?", id).Find(&todos).Error
 	if err != nil {
 		return nil, err
 	} else {
@@ -48,24 +48,31 @@ func AddTodo(todo *Model.Todo) (*Model.Todo, error) {
 	return todo, nil
 }
 func UpdateTodo(todo *Model.Todo) (*Model.Todo, error) {
-	err := Db.DB.Save(&todo).Error
+	err := Db.DB.Omit("created_at", "user_id", "group_id", "todo_name", "todo_content").Save(&todo).Error
 	if err != nil {
 		return nil, err
 	}
 	return todo, nil
 }
 
-func DeleteTodoById(id uint) error {
+func DeleteTodoById(id, userId uint) error {
 	todo := Model.Todo{}
-	err := Db.DB.Where("todoId = ?", id).Delete(&todo).Error
+	err := Db.DB.Where("todo_id = ? and user_id = ?", id, userId).Delete(&todo).Error
 	if err != nil {
 		return err
 	}
 	return nil
 }
+func DeleteTodo(todo *Model.Todo) (*Model.Todo, error) {
+	err := Db.DB.Delete(&todo).Error
+	if err != nil {
+		return nil, err
+	}
+	return todo, nil
+}
 func DeleteTodoByName(name string) error {
 	todo := Model.Todo{}
-	err := Db.DB.Where("todoName = ?", name).Delete(&todo).Error
+	err := Db.DB.Where("todo_name = ?", name).Delete(&todo).Error
 	if err != nil {
 		return err
 	}

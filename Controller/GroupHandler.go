@@ -2,6 +2,7 @@ package Controller
 
 import (
 	"github.com/WenkanHuang/gin_gorm/Dao"
+	"github.com/WenkanHuang/gin_gorm/Dto"
 	"github.com/WenkanHuang/gin_gorm/Model"
 	"github.com/WenkanHuang/gin_gorm/Response"
 	"github.com/gin-gonic/gin"
@@ -19,7 +20,7 @@ func AddGroup(ctx *gin.Context) {
 	if err != nil {
 		Response.Fail(ctx, nil, "add failed")
 	} else {
-		Response.Success(ctx, gin.H{"group": group}, "OK")
+		Response.Success(ctx, gin.H{"group": Dto.ToGroupDto(*group)}, "OK")
 	}
 }
 
@@ -45,7 +46,7 @@ func UpdateGroup(ctx *gin.Context) {
 	if err != nil {
 		Response.Fail(ctx, gin.H{"error": err}, "update failed")
 	} else {
-		Response.Success(ctx, gin.H{"group": group}, "OK")
+		Response.Success(ctx, gin.H{"group": Dto.ToGroupDto(*group)}, "OK")
 	}
 }
 

@@ -25,14 +25,12 @@ func SetupRouter() *gin.Engine {
 		group.GET("/list", Middleware.AuthMiddleware(), Controller.ShowGroupList)
 	}
 
-	//
-	//postRoutes := r.Group("/post")
-	//postRoutes.Use(Middleware.AuthMiddleware())
-	//postController := Controller.NewPostController()
-	//postRoutes.POST("/add", postController.AddPost)
-	//postRoutes.GET("/getAll", postController.GetPost)
-	//postRoutes.PUT("/update", postController.UpdatePost)
-	//postRoutes.DELETE("/delete", postController.DeletePostByID)
+	todo := r.Group("/v1/todo")
+	{
+		todo.POST("/add", Middleware.AuthMiddleware(), Controller.AddTodo)
+		todo.PUT("/:id", Middleware.AuthMiddleware(), Controller.UpdateTodo)
+		todo.DELETE("/:id", Middleware.AuthMiddleware(), Controller.DeleteTodo)
+	}
 
 	return r
 }
