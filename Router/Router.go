@@ -17,12 +17,14 @@ func SetupRouter() *gin.Engine {
 		user.GET("/info", Middleware.AuthMiddleware(), Controller.Info)
 	}
 
-	//categoryRoutes := r.Group("/category")
-	//categoryController := Controller.NewCategoryController()
-	//categoryRoutes.POST("/add", categoryController.AddCategory)
-	//categoryRoutes.GET("/getAll", categoryController.GetCategories)
-	//categoryRoutes.PUT("/update", categoryController.UpdateCategory)
-	//categoryRoutes.DELETE("/delete", categoryController.DeleteCategoryByID)
+	group := r.Group("/v1/group")
+	{
+		group.POST("/add", Middleware.AuthMiddleware(), Controller.AddGroup)
+		group.PUT("/:id", Middleware.AuthMiddleware(), Controller.UpdateGroup)
+		group.DELETE("/:id", Middleware.AuthMiddleware(), Controller.DeleteGroupById)
+		group.GET("/list", Middleware.AuthMiddleware(), Controller.GetTodoList)
+	}
+
 	//
 	//postRoutes := r.Group("/post")
 	//postRoutes.Use(Middleware.AuthMiddleware())

@@ -33,7 +33,7 @@ func Register(ctx *gin.Context) {
 		Password: string(hashedPassword),
 	}
 	Db.DB.Create(&user)
-	Response.Succces(ctx, nil, "Register success!")
+	Response.Success(ctx, nil, "Register success!")
 }
 
 func Login(ctx *gin.Context) {
@@ -62,7 +62,7 @@ func Login(ctx *gin.Context) {
 		log.Printf("token generate error:%v", err)
 		return
 	}
-	Response.Succces(ctx, gin.H{"token": token}, "Login success!")
+	Response.Success(ctx, gin.H{"token": token}, "Login success!")
 }
 
 func Info(ctx *gin.Context) {

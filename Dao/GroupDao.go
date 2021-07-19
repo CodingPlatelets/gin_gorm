@@ -53,3 +53,11 @@ func DeleteGroupById(id uint) error {
 	}
 	return nil
 }
+
+func AddGroup(g *Model.Group) (*Model.Group, error) {
+	err := Db.DB.Create(&g).Error
+	if err != nil {
+		return nil, err
+	}
+	return g, nil
+}

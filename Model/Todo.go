@@ -3,7 +3,7 @@ package Model
 import "time"
 
 type Todo struct {
-	TodoID      uint      `gorm:"primaryKey" json:"todoId" uri:"todoId"`
+	TodoId      uint      `gorm:"primaryKey" json:"todoId" uri:"todoId"`
 	TodoName    string    `gorm:"primaryKey;unique" json:"todoName" uri:"todoName"`
 	TodoContent string    `gorm:"primaryKey" json:"todoContent" uri:"todoContent"`
 	IsFinished  bool      `json:"isFinished" uri:"isFinished"`
