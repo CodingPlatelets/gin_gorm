@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/WenkanHuang/gin_gorm/Controller"
-	"github.com/gin-gonic/gin"
+	"github.com/WenkanHuang/gin_gorm/Cmd"
+	"os"
 )
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", Controller.Ping)
-	r.Run()
-
+	if err := Cmd.Execute(); err != nil {
+		println("start fail: ", err.Error())
+		os.Exit(-1)
+	}
 }

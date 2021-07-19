@@ -1,6 +1,7 @@
 package Common
 
 import (
+	"github.com/WenkanHuang/gin_gorm/Model"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -15,7 +16,7 @@ type Claims struct {
 func ReleaseToken(user Model.User) (string, error) {
 	expirationTime := time.Now().Add(7 * 24 * time.Hour)
 	claims := &Claims{
-		UserId: user.ID,
+		UserId: user.UserId,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 			IssuedAt:  time.Now().Unix(),
