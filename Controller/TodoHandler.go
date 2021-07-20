@@ -2,11 +2,13 @@ package Controller
 
 import (
 	"github.com/WenkanHuang/gin_gorm/Dao"
+	"github.com/WenkanHuang/gin_gorm/Db"
 	"github.com/WenkanHuang/gin_gorm/Dto"
 	"github.com/WenkanHuang/gin_gorm/Model"
 	"github.com/WenkanHuang/gin_gorm/Response"
 	"github.com/WenkanHuang/gin_gorm/Util"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"strconv"
 	"time"
 )
@@ -31,10 +33,7 @@ func AddTodo(ctx *gin.Context) {
 	if errUser != nil {
 		Response.Fail(ctx, gin.H{"error": errUser}, "group is not exits")
 	} else {
-		//todo: 等价于: UPDATE `foods` SET `stock` = stock + 1  WHERE `foods`.`id` = '2'
-		//db.Model(&food).Update("stock", gorm.Expr("stock + 1"))
-		count.ItemCOUNT++
-		_, errCount := Dao.UpdateGroup(count)
+		errCount := Db.DB.Model(&count).Update("item_count", gorm.Expr("item_count + 1")).Error
 		if errCount != nil {
 			Response.Fail(ctx, gin.H{"error": errCount}, "add item failed")
 		}
@@ -57,6 +56,33 @@ func UpdateTodo(ctx *gin.Context) {
 		} else {
 			bind.TodoId = uint(id)
 			bind.UserId = user.(Model.User).UserId
+			if bind.GroupId != 0 {
+				origin, errBefore := Dao.GetGroupByTodoId(bind.TodoId)
+				after, errAfter := Dao.GetGroupByGroupId(bind.GroupId)
+				if errBefore != nil {
+					Response.Fail(ctx, gin.H{"error": errBefore}, "original group is not exits")
+					return
+				} else if errAfter != nil {
+					Response.Fail(ctx, gin.H{"error": errAfter}, "after group is not exits")
+					return
+				} else {
+					err_original := Db.DB.Model(&origin).Update("item_count", gorm.Expr("item_count - 1")).Error
+					err_after := Db.DB.Model(&after).Update("item_count", gorm.Expr("item_count + 1")).Error
+					if err_original != nil || err_after != nil {
+						Response.Fail(ctx, gin.H{"error_or": err_original, "error_ad": err_after}, "update items error")
+						return
+					} else {
+						_, errUpdate := Dao.UpdateTodo(&bind)
+						if errUpdate != nil {
+							Response.Fail(ctx, gin.H{"error": errUpdate}, "update failed")
+							return
+						} else {
+							Response.Success(ctx, nil, "OK")
+							return
+						}
+					}
+				}
+			}
 			_, errUpdate := Dao.UpdateTodo(&bind)
 			if errUpdate != nil {
 				Response.Fail(ctx, gin.H{"error": errUpdate}, "update failed")
@@ -88,8 +114,7 @@ func DeleteTodo(ctx *gin.Context) {
 				Response.Fail(ctx, gin.H{"error": errDelete}, "delete failed")
 				return
 			} else {
-				count.ItemCOUNT--
-				_, errCount := Dao.UpdateGroup(count)
+				errCount := Db.DB.Model(&count).Update("item_count", gorm.Expr("item_count - 1")).Error
 				if errCount != nil {
 					Response.Fail(ctx, gin.H{"error": errCount}, "delete item failed")
 					return
@@ -102,19 +127,6 @@ func DeleteTodo(ctx *gin.Context) {
 }
 
 func GetTodo(ctx *gin.Context) {
-	//create_at: 'datetime'  # 根据创建时间筛选
-	//keyword: str  # 根据关键词筛选
-	//todo_group_id: int  # 根据分组筛选
-	//is_finished: bool  # 根据是否已完成筛选
-	//createdAt := ctx.DefaultQuery("created_at", "%")
-	//keyword := ctx.DefaultQuery("todo_content", "%")
-	//groupId := ctx.DefaultQuery("group_id", "%")
-	//isFinished := ctx.DefaultQuery("is_finished", "false")
-	//selectCondition := make(map[string]interface{})
-	//selectCondition["created_at"] = createdAt
-	//selectCondition["keyword"] = keyword
-	//selectCondition["group_id"] = groupId
-	//selectCondition["is_finished"] = isFinished
 	var s Dto.Condition
 	errBind := ctx.ShouldBindQuery(&s)
 	if s.CreatedAt.IsZero() {

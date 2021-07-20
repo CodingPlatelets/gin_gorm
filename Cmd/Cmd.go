@@ -57,7 +57,10 @@ func Execute() error {
 
 		r := Router.SetupRouter()
 		port := viper.GetString("server.port")
-		r.Run(port)
+		errRun := r.Run(port)
+		if errRun != nil {
+			return errRun
+		}
 		logger.Println("port = *** =", port)
 		return nil
 	}
