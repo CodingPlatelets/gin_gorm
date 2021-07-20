@@ -5,8 +5,10 @@ import (
 	"github.com/WenkanHuang/gin_gorm/Dto"
 	"github.com/WenkanHuang/gin_gorm/Model"
 	"github.com/WenkanHuang/gin_gorm/Response"
+	"github.com/WenkanHuang/gin_gorm/Util"
 	"github.com/gin-gonic/gin"
 	"strconv"
+	"time"
 )
 
 func AddTodo(ctx *gin.Context) {
@@ -74,22 +76,60 @@ func DeleteTodo(ctx *gin.Context) {
 	todoId, errFormat := strconv.Atoi(ctx.Param("id"))
 	if errFormat != nil {
 		Response.Fail(ctx, gin.H{"error": errFormat}, "id is not an integer value")
+		return
 	} else {
 		count, errGroup := Dao.GetGroupByTodoId(uint(todoId))
 		if errGroup != nil {
 			Response.Fail(ctx, gin.H{"error": errGroup}, "group is not exits")
+			return
 		} else {
-			count.ItemCOUNT--
-			_, errCount := Dao.UpdateGroup(count)
-			if errCount != nil {
-				Response.Fail(ctx, gin.H{"error": errCount}, "delete item failed")
+			errDelete := Dao.DeleteTodoById(uint(todoId), userId)
+			if errDelete != nil {
+				Response.Fail(ctx, gin.H{"error": errDelete}, "delete failed")
+				return
+			} else {
+				count.ItemCOUNT--
+				_, errCount := Dao.UpdateGroup(count)
+				if errCount != nil {
+					Response.Fail(ctx, gin.H{"error": errCount}, "delete item failed")
+					return
+				}
 			}
-		}
-		errDelete := Dao.DeleteTodoById(uint(todoId), userId)
-		if errDelete != nil {
-			Response.Fail(ctx, gin.H{"error": errDelete}, "delete failed")
-		} else {
 			Response.Success(ctx, nil, "OK")
 		}
+
 	}
+}
+
+func GetTodo(ctx *gin.Context) {
+	//create_at: 'datetime'  # 根据创建时间筛选
+	//keyword: str  # 根据关键词筛选
+	//todo_group_id: int  # 根据分组筛选
+	//is_finished: bool  # 根据是否已完成筛选
+	//createdAt := ctx.DefaultQuery("created_at", "%")
+	//keyword := ctx.DefaultQuery("todo_content", "%")
+	//groupId := ctx.DefaultQuery("group_id", "%")
+	//isFinished := ctx.DefaultQuery("is_finished", "false")
+	//selectCondition := make(map[string]interface{})
+	//selectCondition["created_at"] = createdAt
+	//selectCondition["keyword"] = keyword
+	//selectCondition["group_id"] = groupId
+	//selectCondition["is_finished"] = isFinished
+	var s Dto.Condition
+	errBind := ctx.ShouldBindQuery(&s)
+	if s.CreatedAt.IsZero() {
+		loc, _ := time.LoadLocation("Asia/Shanghai")
+		s.CreatedAt, _ = time.ParseInLocation(Util.TimeFormat, time.Now().Format(Util.TimeFormat), loc)
+	}
+	if errBind != nil {
+		Response.Fail(ctx, gin.H{"error": errBind.Error()}, "Bind error")
+	} else {
+		todos, err := Dao.GetTodoBySelectCondition(s)
+		if err != nil {
+			Response.Fail(ctx, gin.H{"error": err.Error()}, "conditions error")
+		} else {
+			Response.Success(ctx, gin.H{"todos": Dto.TosdTodoDto(todos)}, "OK")
+		}
+	}
+
 }
