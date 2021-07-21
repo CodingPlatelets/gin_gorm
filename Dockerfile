@@ -1,9 +1,10 @@
 FROM golang:latest
 
 ENV GOPROXY https://goproxy.cn,direct
-WORKDIR /gin_web
-COPY . /gin_web
-RUN go build -o gin_web .
+WORKDIR .
+ADD main .
+ADD ./Config/application.yaml ./Config/application.yaml
 
-EXPOSE 8000
-ENTRYPOINT ["./gin_web"]
+
+EXPOSE 8001
+CMD ["./main","--config=./Config/application.yaml"]
