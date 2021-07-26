@@ -1,4 +1,4 @@
-package Router
+package router
 
 import (
 	"github.com/WenkanHuang/gin_gorm/Controller"
