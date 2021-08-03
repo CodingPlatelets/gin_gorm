@@ -5,7 +5,7 @@ import (
 	"github.com/WenkanHuang/gin_gorm/Config"
 	"github.com/WenkanHuang/gin_gorm/Db"
 	"github.com/WenkanHuang/gin_gorm/Model"
-	"github.com/WenkanHuang/gin_gorm/Router"
+	"github.com/WenkanHuang/gin_gorm/router"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -55,7 +55,7 @@ func Execute() error {
 			}
 		}(d)
 
-		r := Router.SetupRouter()
+		r := router.SetupRouter()
 		port := viper.GetString("server.port")
 		errRun := r.Run(port)
 		if errRun != nil {
