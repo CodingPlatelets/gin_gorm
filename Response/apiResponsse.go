@@ -1,8 +1,15 @@
+/*
+ * @Auther: Edward
+ * @Date: 2021-07-19 22:12:14
+ * @LastEditTime: 2021-08-29 17:17:00
+ * @FilePath: \gin_gorm\Response\apiResponsse.go
+ */
 package Response
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Response(ctx *gin.Context, httpStatus int, code int, data gin.H, msg string) {
