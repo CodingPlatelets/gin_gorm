@@ -24,7 +24,7 @@ func initConfig() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config/application.yaml", "config file ( ")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config/application.yaml", "config file (default is $HOME/.cobra.yaml) ")
 	rootCmd.PersistentFlags().Bool("debug", true, "开启debug")
 	viper.SetDefault("gin.mode", rootCmd.PersistentFlags().Lookup("debug"))
 }
@@ -57,7 +57,10 @@ func Execute() error {
 
 		r := router.SetupRouter()
 		port := viper.GetString("server.port")
-		r.Run(port)
+		errRun := r.Run(port)
+		if errRun != nil {
+			return errRun
+		}
 		logger.Println("port = *** =", port)
 		return nil
 	}

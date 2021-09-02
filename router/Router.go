@@ -9,7 +9,7 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(Middleware.CORSMiddleware(), Middleware.RecoverMiddleware())
-
+  r.GET("/ping",Controller.Ping)
 	user := r.Group("/v1/user")
 	{
 		user.POST("/register", Middleware.CORSMiddleware(), Controller.Register)
@@ -30,6 +30,7 @@ func SetupRouter() *gin.Engine {
 		todo.POST("/add", Middleware.AuthMiddleware(), Controller.AddTodo)
 		todo.PUT("/:id", Middleware.AuthMiddleware(), Controller.UpdateTodo)
 		todo.DELETE("/:id", Middleware.AuthMiddleware(), Controller.DeleteTodo)
+		todo.GET("/list", Middleware.AuthMiddleware(), Controller.GetTodo)
 	}
 
 	return r

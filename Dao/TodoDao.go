@@ -2,6 +2,7 @@ package Dao
 
 import (
 	"github.com/WenkanHuang/gin_gorm/Db"
+	"github.com/WenkanHuang/gin_gorm/Dto"
 	"github.com/WenkanHuang/gin_gorm/Model"
 )
 
@@ -83,4 +84,21 @@ func DeleteTodoByName(name string) error {
 		return err
 	}
 	return nil
+}
+
+func GetTodoBySelectCondition(c Dto.Condition) ([]Model.Todo, error) {
+	var todo []Model.Todo
+	sql := Db.DB.Where("created_at < ?", c.CreatedAt)
+	sel := "%" + c.Keyword + "%"
+	sql = Db.DB.Model(&todo).Where("todo_content like ?", sel)
+	if c.GroupId != 0 {
+		sql = Db.DB.Model(&todo).Where("group_id = ? ", c.GroupId)
+	}
+	if c.IsFinished == true {
+		sql = Db.DB.Model(&todo).Where("is_finished = ?", 1)
+	} else {
+		sql = Db.DB.Model(&todo).Where("is_finished = ?", 0)
+	}
+	sql.Find(&todo)
+	return todo, nil
 }
