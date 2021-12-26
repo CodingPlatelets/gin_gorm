@@ -1,6 +1,15 @@
+/*
+ * @Auther: Platelets
+ * @Date: 2021-11-10 16:29:55
+ * @LastEditTime: 2021-12-10 16:18:36
+ * @FilePath: \gin_gorm\Controller\UserHandler.go
+ */
 package Controller
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/WenkanHuang/gin_gorm/Common"
 	"github.com/WenkanHuang/gin_gorm/Db"
 	"github.com/WenkanHuang/gin_gorm/Dto"
@@ -9,15 +18,13 @@ import (
 	"github.com/WenkanHuang/gin_gorm/Util"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"log"
-	"net/http"
 )
 
 func Register(ctx *gin.Context) {
 	name := ctx.PostForm("name")
 	password := ctx.PostForm("password")
 	if len(password) < 6 {
-		Response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "Password not less 6 digits!")
+		Response.SimpleResponse(ctx, http.StatusUnprocessableEntity, nil, "Password not less 6 digits!")
 		return
 	}
 	if len(name) == 0 {
@@ -25,7 +32,7 @@ func Register(ctx *gin.Context) {
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost) // 创建用户的时候要加密用户的密码
 	if err != nil {
-		Response.Response(ctx, http.StatusInternalServerError, 500, nil, "Hashed password error!")
+		Response.SimpleResponse(ctx, http.StatusInternalServerError, nil, "Hashed password error!")
 		return
 	}
 	user := Model.User{
@@ -47,7 +54,7 @@ func Login(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "Password len not less 6 bits!"})
 		return
 	}
-	var user Model.User //判断是否重名
+	var user Model.User //判断是否存在
 	Db.DB.Where("name = ?", name).First(&user)
 	if user.UserId == 0 {
 		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "User not exist!"})
