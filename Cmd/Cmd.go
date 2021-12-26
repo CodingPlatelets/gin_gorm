@@ -2,6 +2,8 @@ package Cmd
 
 import (
 	"database/sql"
+	"os"
+
 	"github.com/WenkanHuang/gin_gorm/Config"
 	"github.com/WenkanHuang/gin_gorm/Db"
 	"github.com/WenkanHuang/gin_gorm/Model"
@@ -9,7 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 var (
@@ -24,7 +25,7 @@ func initConfig() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config/application.yaml", "config file (default is $HOME/.cobra.yaml) ")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "Config/application.yaml", "config file (default is $HOME/.cobra.yaml) ")
 	rootCmd.PersistentFlags().Bool("debug", true, "开启debug")
 	viper.SetDefault("gin.mode", rootCmd.PersistentFlags().Lookup("debug"))
 }

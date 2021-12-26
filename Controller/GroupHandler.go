@@ -1,12 +1,13 @@
 package Controller
 
 import (
+	"strconv"
+
 	"github.com/WenkanHuang/gin_gorm/Dao"
 	"github.com/WenkanHuang/gin_gorm/Dto"
 	"github.com/WenkanHuang/gin_gorm/Model"
 	"github.com/WenkanHuang/gin_gorm/Response"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 func AddGroup(ctx *gin.Context) {
@@ -19,9 +20,9 @@ func AddGroup(ctx *gin.Context) {
 	})
 	if err != nil {
 		Response.Fail(ctx, nil, "add failed")
-	} else {
-		Response.Success(ctx, gin.H{"group": Dto.ToGroupDto(*group)}, "OK")
+		return
 	}
+	Response.Success(ctx, gin.H{"group": Dto.ToGroupDto(*group)}, "OK")
 }
 
 func ShowGroupList(ctx *gin.Context) {
@@ -29,9 +30,10 @@ func ShowGroupList(ctx *gin.Context) {
 	groupList, err := Dao.GetGroupsByUserId(user.(Model.User).UserId)
 	if err != nil {
 		Response.Fail(ctx, nil, "add failed")
-	} else {
-		Response.Success(ctx, gin.H{"todo_group_list": groupList}, "OK")
+		return
 	}
+	Response.Success(ctx, gin.H{"todo_group_list": groupList}, "OK")
+
 }
 func UpdateGroup(ctx *gin.Context) {
 	groupName := ctx.PostForm("groupName")
