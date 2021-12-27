@@ -1,11 +1,12 @@
 package Middleware
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/WenkanHuang/gin_gorm/Common"
 	"github.com/WenkanHuang/gin_gorm/Db"
 	"github.com/WenkanHuang/gin_gorm/Model"
-	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +14,7 @@ import (
 func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		tokenString := ctx.GetHeader("Authorization") // 获取authorization header
-		prefix := "Bearer "
+		prefix := "Bearer"
 
 		//validate token
 		if tokenString == "" || !strings.HasPrefix(tokenString, prefix) {
