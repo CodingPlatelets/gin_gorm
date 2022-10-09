@@ -1,6 +1,8 @@
 package dao
 
 import (
+	"gorm.io/gorm"
+
 	"github.com/WenkanHuang/gin_gorm/db"
 	"github.com/WenkanHuang/gin_gorm/model"
 )
@@ -13,6 +15,33 @@ func GetGroupsByUserId(id uint) ([]*model.Group, error) {
 	} else {
 		return groups, nil
 	}
+}
+
+func UpdateGroupCount(ori, cur uint) error {
+	return db.DB.Transaction(func(tx *gorm.DB) error {
+		// find ori group
+		oriTodo := &model.Todo{}
+		if err := tx.Model(oriTodo).Where("todo_id=?", ori).First(oriTodo).Error; err != nil {
+			return err
+		}
+		oriGroup := &model.Group{}
+		if err := tx.Model(oriGroup).Where("group_id=?", oriTodo.GroupId).First(oriGroup).Error; err != nil {
+			return err
+		}
+
+		// find current group
+		curGroup := &model.Group{}
+		if err := tx.Model(curGroup).Where("group_id=?", cur).First(curGroup).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&oriGroup).Update("item_count", gorm.Expr("item_count - 1")).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&curGroup).Update("item_count", gorm.Expr("item_count + 1")).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func GetGroupByGroupName(name string) (*model.Group, error) {
@@ -35,13 +64,13 @@ func GetGroupByTodoId(id uint) (*model.Group, error) {
 	todo := new(model.Todo)
 	if err := db.DB.Where("todo_id=?", id).First(&todo).Error; err != nil {
 		return nil, err
-	} else {
-		group := new(model.Group)
-		if err := db.DB.Where("group_id=?", todo.GroupId).First(&group).Error; err != nil {
-			return nil, err
-		}
-		return group, nil
 	}
+	group := new(model.Group)
+	if err := db.DB.Where("group_id=?", todo.GroupId).First(&group).Error; err != nil {
+		return nil, err
+	}
+	return group, nil
+
 }
 
 func UpdateGroup(group *model.Group) (*model.Group, error) {

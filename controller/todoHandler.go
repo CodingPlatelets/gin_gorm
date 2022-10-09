@@ -47,51 +47,39 @@ func AddTodo(ctx *gin.Context) {
 }
 
 func UpdateTodo(ctx *gin.Context) {
-	user, _ := ctx.Get("user")
-	id, errFormat := strconv.Atoi(ctx.Param("id"))
-	if errFormat != nil {
-		response.Fail(ctx, gin.H{"error": errFormat}, "id is not a integer value")
+	user, ok := ctx.Get("user")
+	if !ok {
+		response.Fail(ctx, nil, "context error")
+		return
+	}
+	var id, err = strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		response.Fail(ctx, gin.H{"error": err}, "id is not a integer value")
 		return
 	}
 	var bind model.Todo
-	errBind := ctx.ShouldBind(&bind)
-	if errBind != nil {
-		response.Fail(ctx, gin.H{"error": errBind.Error()}, "bind failed")
+	err = ctx.ShouldBind(&bind)
+	if err != nil {
+		response.Fail(ctx, gin.H{"error": err}, "bind failed")
 		return
 	}
 	bind.TodoId = uint(id)
 	bind.UserId = user.(model.User).UserId
+
+	// this todo has a origin group, so you need to sub its count and add it to the new one
 	if bind.GroupId != 0 {
-		origin, errBefore := dao.GetGroupByTodoId(bind.TodoId)
-		after, errAfter := dao.GetGroupByGroupId(bind.GroupId)
-		if errBefore != nil {
-			response.Fail(ctx, gin.H{"error": errBefore}, "original group is not exits")
-			return
-		} else if errAfter != nil {
-			response.Fail(ctx, gin.H{"error": errAfter}, "after group is not exits")
+		err = dao.UpdateGroupCount(bind.TodoId, bind.GroupId)
+		if err != nil {
+			response.Fail(ctx, gin.H{"error": err}, "update count error")
 			return
 		}
-		err_original := db.DB.Model(&origin).Update("item_count", gorm.Expr("item_count - 1")).Error
-		err_after := db.DB.Model(&after).Update("item_count", gorm.Expr("item_count + 1")).Error
-		if err_original != nil || err_after != nil {
-			response.Fail(ctx, gin.H{"error_or": err_original, "error_ad": err_after}, "update items error")
-			return
-		}
-		_, errUpdate := dao.UpdateTodo(&bind)
-		if errUpdate != nil {
-			response.Fail(ctx, gin.H{"error": errUpdate}, "update failed")
-			return
-		}
-		response.Success(ctx, nil, "OK")
-		return
 	}
-	_, errUpdate := dao.UpdateTodo(&bind)
-	if errUpdate != nil {
-		response.Fail(ctx, gin.H{"error": errUpdate}, "update failed")
+	_, err = dao.UpdateTodo(&bind)
+	if err != nil {
+		response.Fail(ctx, gin.H{"error": err}, "update failed")
 		return
 	}
 	response.Success(ctx, nil, "OK")
-
 }
 
 func DeleteTodo(ctx *gin.Context) {
