@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/WenkanHuang/gin_gorm/Cmd"
 	"os"
+
+	"github.com/WenkanHuang/gin_gorm/cmd"
 )
 
 func main() {
-	if err := Cmd.Execute(); err != nil {
+	if err := cmd.Execute(); err != nil {
 		println("start fail: ", err.Error())
 		os.Exit(-1)
 	}

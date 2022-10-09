@@ -1,0 +1,8 @@
+server:
+  port: ":8080"
+db:
+  hostname: xxx.xxx.xxx.xxx
+  port: xxxx
+  username: xxxx
+  password: xxxxxxxx
+  dbname: gin_gorm
