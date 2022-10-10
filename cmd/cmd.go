@@ -25,7 +25,7 @@ func initConfig() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "Config/application.yaml", "config file (default is $HOME/.cobra.yaml) ")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config/application.yaml", "config file (default is $HOME/.cobra.yaml) ")
 	rootCmd.PersistentFlags().Bool("debug", true, "start debug")
 	viper.SetDefault("gin.mode", rootCmd.PersistentFlags().Lookup("debug"))
 }
@@ -40,7 +40,6 @@ func Execute() error {
 	})
 
 	// Output to stdout instead of the default stderr
-	// Can be any io.Writer, see below for File example
 	log.SetOutput(os.Stdout)
 
 	// Only log the warning severity or above.
